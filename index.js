@@ -1,5 +1,14 @@
 const inquirer = require('inquirer')
+const cTable = require('console.table')
+const mysql = require('mysql2')
 // create a const to require a list of employees as an array to be accessed by npm inquirer
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'rootp123'
+    database: 'employee_db'
+})
 
 const initPrompt = [
     {
