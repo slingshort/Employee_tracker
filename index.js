@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const mysql = require('mysql2');
-const output = []
 // create a const to require a list of employees as an array to be accessed by npm inquirer
 
 const connection = mysql.createConnection({
@@ -71,16 +70,47 @@ const updateEmployee = [
     }
 ]
 
-function viewDept() {
-    connection.query("SELECT * from department", (err,res) => {
+// functions to view tables which are called upon during init()
+function viewDepts() {
+    connection.query("SELECT * FROM department", (err,res) => {
         if (err) throw err;
         console.log("results", res);
     })
+}
 
+function viewRoles() {
+    connection.query("SELECT * FROM job_role", (err,res) => {
+        if (err) throw err;
+        console.log("results", res);
+    })
+}
 
+function viewEmployees() {
+    connection.query("SELECT * FROM employee", (err,res) => {
+        if (err) throw err;
+        console.log("results", res);
+    })
+}
+
+// fucntion to add to tables which are later called upon
+function addDept() {
+    inquirer.prompt({
+        type:'input',
+        name:'dept',
+        message:'What is the name of the department?'
+    })
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        })
 }
 
 function init() {
+
+    connection.query("SOURCE db/schema.sql"), (err,res) => {
+        if (err) throw err;
+        console.log("schema has run", res)
+    };
+
     inquirer.prompt({
         type: 'list',
         name: 'menu',
@@ -88,10 +118,15 @@ function init() {
         choices: ['View all departments', 'View all roles', 'View all employees', 'Add department', 'Add role', 'Add Employee', 'Quit'],
     })
         .then((data) => {
-            output.push(JSON.stringify(data.menu))
-            console.log(output)
+            console.log(JSON.stringify(data.menu))
             if (data.menu === "View all departments") {
-                viewDept()
+                viewDepts()
+            } else if (data.menu === "View all roles") {
+                viewRoles()
+            } else if (data.menu === "View all employees") {
+                viewEmployees()
+            } else if (data.menu === "Add department") {
+                addDept()
             }
         })
 }
