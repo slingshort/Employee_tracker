@@ -1,6 +1,6 @@
-INSERT INTO department (name, id)
-VALUES ("Engineering", 1),
-        ("Legal", 2);
+INSERT INTO department (dept_name)
+VALUES ("Engineering"),
+        ("Legal");
 
 INSERT INTO job_role (title, salary, department_id)
 VALUES ('Lead Engineer',1651613, 1),

@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const mysql = require('mysql2');
-
+const output = []
 // create a const to require a list of employees as an array to be accessed by npm inquirer
 
 const connection = mysql.createConnection({
@@ -11,14 +11,6 @@ const connection = mysql.createConnection({
     database: 'employee_db'
 })
 
-const initPrompt = [
-    {
-        type: 'list',
-        name: 'menu',
-        message: 'Please select from the following options',
-        choices: ['View all departments', 'View all roles', 'View all employees', 'Add department', 'Add role', 'Add Employee', 'Quit']
-    }
-]
 
 const addRole = [
     {
@@ -79,9 +71,29 @@ const updateEmployee = [
     }
 ]
 
+function viewDept() {
+    connection.query("SELECT * from department", (err,res) => {
+        if (err) throw err;
+        console.log("results", res);
+    })
+
+
+}
+
 function init() {
-    inquirer.prompt(initPrompt)
+    inquirer.prompt({
+        type: 'list',
+        name: 'menu',
+        message: 'Please select from the following options',
+        choices: ['View all departments', 'View all roles', 'View all employees', 'Add department', 'Add role', 'Add Employee', 'Quit'],
+    })
         .then((data) => {
-            console.log(data)
+            output.push(JSON.stringify(data.menu))
+            console.log(output)
+            if (data.menu === "View all departments") {
+                viewDept()
+            }
         })
 }
+
+init()
