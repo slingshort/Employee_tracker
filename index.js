@@ -43,13 +43,13 @@ async function addRoleQuestions() {
 }
 
 async function addEmployeeQuestions() {
-    let managers = [];
+    let roles = [];
 
     await connection
         .promise()
-        .query('SELECT * from EMPLOYEE')
+        .query('SELECT title from JOB_ROLE')
         .then((data) => {
-            managers = data[0].map((employee) => employee.first_name);
+            roles = data[0].map((role) => role.title);
         })
     
     return [
@@ -64,9 +64,10 @@ async function addEmployeeQuestions() {
             message: 'What is the last name of the employee?'
         }, 
         {
-            type: 'input',
+            type: 'list',
             name: 'role',
-            message: 'What is the role of this employee?'
+            message: 'What is the role of this employee?',
+            choices: roles
         },
         {
             type: 'input',
@@ -159,7 +160,7 @@ async function addRole() {
             },
             (err, res) => {
                 if (err) throw err;
-                console.table("results", res);
+                console.log("successfully added employee");
                 menu()
             }
         );
@@ -172,8 +173,14 @@ async function addEmployee() {
         console.log(JSON.stringify(data));
         connection.query(
             'INSERT INTO employee SET ?',
-            {
-
+            {  
+                first_name: data.name,
+                last_name: data.lastname,
+            },
+            (err,res) => {
+                if (err) throw err;
+                console.log("successfully added employee");
+                menu()
             }
         )
     })
