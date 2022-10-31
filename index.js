@@ -10,76 +10,103 @@ const connection = mysql.createConnection({
     database: 'employee_db'
 })
 
-const currentDEPT = connection.query("SELECT dept_name from DEPARTMENT", (err,res) => {
-    if (err) throw err;
-    console.log(res)
-})
 
+async function addRoleQuestions() {
+    let allDepts = [];
 
-const addRoleQuestions = [
-    {
-        type: 'input',
-        name: 'name',
-        message: 'What is the job role called?'
-    },
-    {
-        type: 'input',
-        name: 'salary',
-        message: 'What is the salary for this role?'
-    },
+    await connection
+        .promise()
+        .query('SELECT dept_name from DEPARTMENT')
+        .then((data) => {
+            allDepts = data[0].map((dept) => dept.dept_name);
+        });
 
-    {
-        type: 'list',
-        name: 'department',
-        message: 'Which department is this role for?',
-        choices: currentDEPT
-    }
-]
+    return [
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the job role called?',
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'What is the salary for this role?',
+        },
 
-const addEmployeeQuestions = [
-    {
-        type: 'input',
-        name: 'name',
-        message: 'What is the first name of the employee?'
-    },
-    {
-        type: 'input',
-        name: 'lastname',
-        message: 'What is the last name of the employee?'
-    }, 
-    {
-        type: 'input',
-        name: 'role',
-        message: 'What is the role of this employee?'
-    },
-    {
-        type: 'input',
-        name: 'manager',
-        message: 'Who is the manager for this employee?'
-        // managers
-    }
-]
+        {
+            type: 'list',
+            name: 'department',
+            message: 'Which department is this role for?',
+            choices: allDepts,
+        },
+    ];
+}
 
-const updateEmployeeQuestions = [
-    {
-        type: 'list',
-        name: 'update',
-        message: 'Please choose which employee you would like to update information for',
-        // choices: variable globally stored
-    },
-    {
-        type: 'list',
-        name: 'selectfrom',
-        message: 'Which role do you want to assign the chosen employee to?',
-        // choices: variable globally stored.ß
-    }
-]
+async function addEmployeeQuestions() {
+    let managers = [];
+
+    await connection
+        .promise()
+        .query('SELECT * from EMPLOYEE')
+        .then((data) => {
+            managers = data[0].map((employee) => employee.first_name);
+        })
+    
+    return [
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the first name of the employee?'
+        },
+        {
+            type: 'input',
+            name: 'lastname',
+            message: 'What is the last name of the employee?'
+        }, 
+        {
+            type: 'input',
+            name: 'role',
+            message: 'What is the role of this employee?'
+        },
+        {
+            type: 'input',
+            name: 'manager',
+            message: 'Who is the manager for this employee?'
+        }
+    ]
+}   
+
+async function updateEmployeeQuestions() {
+    let allEmployees = [];
+
+    await connection
+        .promise()
+        .query('SELECT * from EMPLOYEE')
+        .then((data) => {
+            allEmployees = data[0].map((employee) => employee.first_name);
+        })
+    
+    return [
+        {
+            type: 'list',
+            name: 'update',
+            message: 'Please choose which employee you would like to update information for',
+            choices: allEmployees
+        },
+        {
+            type: 'list',
+            name: 'selectfrom',
+            message: 'Which role do you want to assign the chosen employee to?',
+            // choices: variable globally stored.
+        }
+    ];
+}
 
 // functions to view tables which are called upon during init()
 function viewDepts() {
-    connection.query("SELECT * FROM department", (err,res) => {
+    connection.query("SELECT dept_name FROM department", (err,res) => {
         if (err) throw err;
-        console.table("results", res);
+        console.log("results", res);
         menu()
     })
 }
@@ -119,18 +146,37 @@ function addDept() {
         })
 }
 
-function addRole() {
-    inquirer.prompt(addRoleQuestions)
-        .then((data) => {
-            console.log(JSON.stringify(data));
-            connection.query('INSERT INTO job_role SET ?',{
+async function addRole() {
+    let questions = await addRoleQuestions();
+    inquirer.prompt(questions).then((data) => {
+        console.log(JSON.stringify(data));
+        connection.query(
+            'INSERT INTO job_role SET ?',
+            {
                 title: data.name,
                 salary: data.salary,
-                // department_id: data.department,             
-            },(err,res)=> {
-                if(err) throw err;
-            })
-        })
+                // department_id: data.department,
+            },
+            (err, res) => {
+                if (err) throw err;
+                console.table("results", res);
+                menu()
+            }
+        );
+    });
+}
+
+async function addEmployee() {
+    let questions = await addEmployeeQuestions();
+    inquirer.prompt(questions).then((data) => {
+        console.log(JSON.stringify(data));
+        connection.query(
+            'INSERT INTO employee SET ?',
+            {
+
+            }
+        )
+    })
 }
 
 // init function to call upon menu

@@ -19,10 +19,13 @@ CREATE TABLE job_role (
 
 CREATE TABLE employee (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(30),
+    first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30),
     role_id INT,
     manager_id INT,
+    is_manager BOOLEAN,
     FOREIGN KEY (role_id)
-    REFERENCES job_role(id)
+    REFERENCES job_role(id),
+    FOREIGN KEY (manager_id)
+    REFERENCES employee(id)
 );
