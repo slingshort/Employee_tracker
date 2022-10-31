@@ -10,8 +10,7 @@ const connection = mysql.createConnection({
     database: 'employee_db'
 })
 
-
-const addRole = [
+const addRoleQuestions = [
     {
         type: 'input',
         name: 'name',
@@ -31,7 +30,7 @@ const addRole = [
     }
 ]
 
-const addEmployee = [
+const addEmployeeQuestions = [
     {
         type: 'input',
         name: 'name',
@@ -55,7 +54,7 @@ const addEmployee = [
     }
 ]
 
-const updateEmployee = [
+const updateEmployeeQuestions = [
     {
         type: 'list',
         name: 'update',
@@ -74,21 +73,24 @@ const updateEmployee = [
 function viewDepts() {
     connection.query("SELECT * FROM department", (err,res) => {
         if (err) throw err;
-        console.log("results", res);
+        console.table("results", res);
+        menu()
     })
 }
 
 function viewRoles() {
     connection.query("SELECT * FROM job_role", (err,res) => {
         if (err) throw err;
-        console.log("results", res);
+        console.table("results", res);
+        menu()
     })
 }
 
 function viewEmployees() {
     connection.query("SELECT * FROM employee", (err,res) => {
         if (err) throw err;
-        console.log("results", res);
+        console.table("results", res);
+        menu()
     })
 }
 
@@ -100,17 +102,33 @@ function addDept() {
         message:'What is the name of the department?'
     })
         .then((data) => {
-            console.log(JSON.stringify(data))
+            console.log(JSON.stringify(data));
+            connection.query('INSERT INTO department SET ?',{
+                dept_name: data.dept
+            },(err,res)=> {
+                if(err) throw err;
+                console.table("results",res);
+                menu()
+            })
         })
 }
 
-function init() {
+function addRole() {
+    inquirer.prompt(addRoleQuestions)
+        .then((data) => {
+            console.log(JSON.stringify(data));
+            connection.query('INSERT INTO job_role SET ?',{
+                title: data.name,
+                salary: data.salary,
+                // department_id: data.department,             
+            },(err,res)=> {
+                if(err) throw err;
+            })
+        })
+}
 
-    connection.query("SOURCE db/schema.sql"), (err,res) => {
-        if (err) throw err;
-        console.log("schema has run", res)
-    };
-
+// init function to call upon menu
+function menu() {
     inquirer.prompt({
         type: 'list',
         name: 'menu',
@@ -127,8 +145,14 @@ function init() {
                 viewEmployees()
             } else if (data.menu === "Add department") {
                 addDept()
+            } else if (data.menu === "Add role") {
+                addRole()
+            } else if (data.menu === "Add Employee") {
+                addEmployee()
+            } else {
+                
             }
         })
 }
 
-init()
+menu()
