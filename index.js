@@ -10,6 +10,12 @@ const connection = mysql.createConnection({
     database: 'employee_db'
 })
 
+const currentDEPT = connection.query("SELECT dept_name from DEPARTMENT", (err,res) => {
+    if (err) throw err;
+    console.log(res)
+})
+
+
 const addRoleQuestions = [
     {
         type: 'input',
@@ -25,8 +31,8 @@ const addRoleQuestions = [
     {
         type: 'list',
         name: 'department',
-        message: 'Which department is this role for?'
-        // choices with department array from database
+        message: 'Which department is this role for?',
+        choices: currentDEPT
     }
 ]
 
