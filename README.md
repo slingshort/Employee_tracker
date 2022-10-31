@@ -14,7 +14,7 @@ This is a command line application that allows users to store and access sql dat
 Before running the applicaion, the schema needs to be sourced. This can be done by running the command <br>
  ```mysql -u root -p``` <br>
 then suppling the mysql password. After this, the schema.sql file can be sourced by running <br>
-```SOURCE db/schema.sqwl```<br>
+```SOURCE db/schema.sql```<br>
 then, the application can be initialised using <br>
 ```npm start```
 
